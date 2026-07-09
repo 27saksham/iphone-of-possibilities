@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>iPhone — An iPhone of Possibilities</title>
+<style>
+  :root {
+    --bg: #000;
+    --text: #f5f5f7;
+    --text-dim: #86868b;
+    --accent-1: #a78bfa;
+    --accent-2: #60a5fa;
+    --accent-3: #f472b6;
+    --nav-h: 48px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: "SF Pro Display", "SF Pro Text", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  /* ---------- Preloader ---------- */
+  #loader {
+    position: fixed; inset: 0; z-index: 1000;
+    background: #000;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 28px;
+    transition: opacity .8s ease, visibility .8s;
+  }
+  #loader.done { opacity: 0; visibility: hidden; }
+  #loader svg { width: 44px; height: 44px; fill: #f5f5f7; animation: pulse 1.6s ease-in-out infinite; }
+  @keyframes pulse { 0%,100% { opacity: .4; } 50% { opacity: 1; } }
+  #loader .bar {
+    width: 180px; height: 3px; border-radius: 3px;
+    background: rgba(255,255,255,.15); overflow: hidden;
+  }
+  #loader .bar i {
+    display: block; height: 100%; width: 0%;
+    background: linear-gradient(90deg, var(--accent-2), var(--accent-1));
+    border-radius: 3px; transition: width .2s ease;
+  }
+
+  /* ---------- Nav ---------- */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 900;
+    height: var(--nav-h);
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(22,22,23,.55);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    border-bottom: 1px solid rgba(255,255,255,.06);
+  }
+  nav ul {
+    display: flex; align-items: center; gap: 36px;
+    list-style: none;
+    font-size: 12px; letter-spacing: -.01em;
+  }
+  nav a { color: rgba(245,245,247,.8); text-decoration: none; transition: color .3s; }
+  nav a:hover { color: #fff; }
+  nav .apple-logo svg { width: 15px; height: 18px; fill: rgba(245,245,247,.85); display: block; transition: fill .3s; }
+  nav .apple-logo:hover svg { fill: #fff; }
+  nav .icon svg { width: 15px; height: 16px; fill: rgba(245,245,247,.8); display: block; }
+  @media (max-width: 820px) { nav ul li.hide-m { display: none; } nav ul { gap: 28px; } }
+
+  /* ---------- Hero ---------- */
+  #hero {
+    position: relative; height: 100vh;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; overflow: hidden;
+  }
+  #stars { position: absolute; inset: 0; z-index: 0; }
+  #hero .glow {
+    position: absolute; left: 50%; top: 62%; transform: translate(-50%,-50%);
+    width: 90vmin; height: 90vmin; border-radius: 50%;
+    background: radial-gradient(circle, rgba(124,93,250,.28) 0%, rgba(96,165,250,.12) 40%, transparent 70%);
+    filter: blur(20px);
+    animation: breathe 6s ease-in-out infinite;
+  }
+  @keyframes breathe { 0%,100% { transform: translate(-50%,-50%) scale(1); opacity:.8; } 50% { transform: translate(-50%,-50%) scale(1.15); opacity: 1; } }
+  #hero .kicker {
+    position: relative; z-index: 2;
+    font-size: 15px; font-weight: 600; letter-spacing: .28em; text-transform: uppercase;
+    color: var(--accent-1);
+    opacity: 0; animation: rise 1.2s .2s cubic-bezier(.22,1,.36,1) forwards;
+  }
+  #hero h1 {
+    position: relative; z-index: 2;
+    font-size: clamp(64px, 14vw, 190px);
+    font-weight: 700; letter-spacing: -.03em; line-height: 1.02;
+    background: linear-gradient(180deg, #fff 30%, #a5b4fc 75%, #7c8cf8 100%);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+    opacity: 0; animation: rise 1.2s .45s cubic-bezier(.22,1,.36,1) forwards;
+  }
+  #hero .sub {
+    position: relative; z-index: 2;
+    margin-top: 18px;
+    font-size: clamp(19px, 2.6vw, 28px); font-weight: 500;
+    color: var(--text-dim); letter-spacing: -.01em;
+    opacity: 0; animation: rise 1.2s .7s cubic-bezier(.22,1,.36,1) forwards;
+  }
+  #hero .sub b { color: var(--text); font-weight: 600; }
+  #hero .cta {
+    position: relative; z-index: 2; margin-top: 34px; display: flex; gap: 18px;
+    opacity: 0; animation: rise 1.2s .9s cubic-bezier(.22,1,.36,1) forwards;
+  }
+  .btn {
+    font-size: 15px; padding: 12px 26px; border-radius: 999px;
+    text-decoration: none; letter-spacing: -.01em; transition: all .3s;
+  }
+  .btn.fill { background: #2997ff; color: #fff; }
+  .btn.fill:hover { background: #48a7ff; transform: scale(1.04); }
+  .btn.line { color: #2997ff; border: 1px solid #2997ff; }
+  .btn.line:hover { background: rgba(41,151,255,.12); transform: scale(1.04); }
+  #hero .chev {
+    position: absolute; bottom: 34px; left: 50%; transform: translateX(-50%); z-index: 2;
+    animation: bob 2s ease-in-out infinite;
+    opacity: 0; animation: bob 2s ease-in-out infinite, fadein 1s 1.4s forwards;
+  }
+  #hero .chev svg { width: 26px; height: 26px; stroke: rgba(245,245,247,.6); }
+  @keyframes rise { from { opacity: 0; transform: translateY(46px); } to { opacity: 1; transform: none; } }
+  @keyframes fadein { to { opacity: 1; } }
+  @keyframes bob { 0%,100% { transform: translate(-50%,0); } 50% { transform: translate(-50%,10px); } }
+
+  /* ---------- Scroll scrub ---------- */
+  #scrub { position: relative; height: 620vh; }
+  #scrub .stage { position: sticky; top: 0; height: 100vh; overflow: hidden; }
+  #frameCanvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  .caption {
+    position: absolute; z-index: 5;
+    opacity: 0; will-change: opacity, transform;
+    transform: var(--base, none) translateY(var(--ty, 40px));
+    pointer-events: none;
+  }
+  .caption h2 {
+    font-size: clamp(28px, 3.2vw, 54px); font-weight: 700; letter-spacing: -.025em; line-height: 1.08;
+  }
+  .caption p { margin-top: 14px; font-size: clamp(15px, 1.4vw, 20px); color: rgba(245,245,247,.75); font-weight: 450; line-height: 1.45; }
+  /* video is contain-fit: width ≈ 80.1vh centered → side columns of black */
+  .cap-1 { left: 0; top: 50%; --base: translateY(-50%); width: calc((100vw - 80.2vh) / 2); padding: 0 2.5vw; }
+  .cap-2 { right: 0; top: 50%; --base: translateY(-50%); width: calc((100vw - 80.2vh) / 2); padding: 0 2.5vw; text-align: right; }
+  .cap-3 { left: 50%; top: 10vh; --base: translateX(-50%); text-align: center; max-width: 90vw; }
+  /* portrait-ish screens: no side columns, overlay the frame instead */
+  @media (max-aspect-ratio: 7/5) {
+    .cap-1 { left: 6vw; top: 14vh; --base: none; width: auto; max-width: 76vw; padding: 0; }
+    .cap-2 { right: 6vw; top: auto; bottom: 16vh; --base: none; width: auto; max-width: 76vw; padding: 0; }
+  }
+  .cap-3 h2 {
+    background: linear-gradient(90deg, #c4b5fd, #93c5fd, #f9a8d4);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  #darkfade { position: absolute; inset: 0; z-index: 8; background: #000; opacity: 0; pointer-events: none; }
+
+  /* ---------- Finale ---------- */
+  #finale {
+    position: relative; min-height: 100vh;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; overflow: hidden; padding: 12vh 24px;
+  }
+  #finale::before {
+    content: ""; position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%);
+    width: 130vmin; height: 130vmin; border-radius: 50%;
+    background: radial-gradient(circle, rgba(139,92,246,.22), rgba(59,130,246,.1) 45%, transparent 70%);
+    filter: blur(30px);
+  }
+  #finale .big {
+    position: relative;
+    font-size: clamp(46px, 8.5vw, 128px);
+    font-weight: 700; letter-spacing: -.03em; line-height: 1.05; max-width: 14ch;
+    background: linear-gradient(110deg, #f5f5f7 10%, #c4b5fd 32%, #93c5fd 50%, #f9a8d4 68%, #f5f5f7 90%);
+    background-size: 220% auto;
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    animation: shimmer 7s linear infinite;
+  }
+  @keyframes shimmer { to { background-position: -220% center; } }
+  #finale .small { position: relative; margin-top: 26px; font-size: clamp(17px, 2vw, 23px); color: var(--text-dim); max-width: 52ch; line-height: 1.5; }
+  #finale .cta { position: relative; margin-top: 38px; display: flex; gap: 18px; }
+
+  .reveal { opacity: 0; transform: translateY(60px); transition: opacity 1s cubic-bezier(.22,1,.36,1), transform 1s cubic-bezier(.22,1,.36,1); }
+  .reveal.in { opacity: 1; transform: none; }
+
+  /* ---------- Feature grid ---------- */
+  #grid { padding: 8vh 4vw 14vh; max-width: 1300px; margin: 0 auto; }
+  #grid .headline { text-align: center; margin-bottom: 64px; }
+  #grid .headline h2 { font-size: clamp(32px, 4.6vw, 56px); font-weight: 700; letter-spacing: -.02em; }
+  #grid .headline p { margin-top: 12px; color: var(--text-dim); font-size: clamp(16px, 1.8vw, 21px); }
+  .tiles { display: grid; grid-template-columns: repeat(6, 1fr); gap: 22px; }
+  .tile {
+    position: relative; border-radius: 28px; padding: 44px 38px; overflow: hidden;
+    background: #101013;
+    border: 1px solid rgba(255,255,255,.07);
+    transition: transform .5s cubic-bezier(.22,1,.36,1), border-color .5s;
+  }
+  .tile:hover { transform: translateY(-8px) scale(1.015); border-color: rgba(255,255,255,.18); }
+  .tile::after {
+    content: ""; position: absolute; inset: 0;
+    background: radial-gradient(600px circle at var(--mx,50%) var(--my,0%), rgba(139,92,246,.16), transparent 45%);
+    opacity: 0; transition: opacity .5s; pointer-events: none;
+  }
+  .tile:hover::after { opacity: 1; }
+  .tile.w3 { grid-column: span 3; } .tile.w2 { grid-column: span 2; } .tile.w4 { grid-column: span 4; }
+  .tile .em { font-size: 42px; line-height: 1; }
+  .tile h3 { margin-top: 20px; font-size: clamp(21px, 2.2vw, 28px); font-weight: 700; letter-spacing: -.02em; }
+  .tile h3 span {
+    background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .tile p { margin-top: 10px; color: var(--text-dim); font-size: 15.5px; line-height: 1.5; }
+  .stat { font-size: clamp(44px, 5vw, 72px); font-weight: 700; letter-spacing: -.03em;
+    background: linear-gradient(180deg, #fff, #818cf8);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+  .stat-l { color: var(--text-dim); font-size: 15px; margin-top: 6px; }
+  @media (max-width: 900px) { .tile.w3, .tile.w2, .tile.w4 { grid-column: span 6; } }
+
+  /* ---------- Footer ---------- */
+  footer {
+    border-top: 1px solid rgba(255,255,255,.08);
+    padding: 34px 6vw 44px; color: var(--text-dim); font-size: 12px;
+    display: flex; flex-direction: column; gap: 10px; max-width: 1300px; margin: 0 auto;
+  }
+  footer .row { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+  footer a { color: rgba(245,245,247,.6); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<!-- Preloader -->
+<div id="loader">
+  <svg viewBox="0 0 814 1000"><path d="M788.1 340.9c-5.8 4.5-108.2 62.2-108.2 190.5 0 148.4 130.3 200.9 134.2 202.2-.6 3.2-20.7 71.9-68.7 141.9-42.8 61.6-87.5 123.1-155.5 123.1s-85.5-39.5-164-39.5c-76.5 0-103.7 40.8-165.9 40.8s-105.6-57-155.5-127C46.7 790.7 0 663 0 541.8c0-194.4 126.4-297.5 250.8-297.5 66.1 0 121.2 43.4 162.7 43.4 39.5 0 101.1-46 176.3-46 28.5 0 130.9 2.6 198.3 99.2zm-234-181.5c31.1-36.9 53.1-88.1 53.1-139.3 0-7.1-.6-14.3-1.9-20.1-50.6 1.9-110.8 33.7-147.1 75.8-28.5 32.4-55.1 83.6-55.1 135.5 0 7.8 1.3 15.6 1.9 18.1 3.2.6 8.4 1.3 13.6 1.3 45.4 0 102.5-30.4 135.5-71.3z"/></svg>
+  <div class="bar"><i id="loadbar"></i></div>
+</div>
+
+<!-- Navigation -->
+<nav>
+  <ul>
+    <li class="apple-logo"><a href="#" aria-label="Apple">
+      <svg viewBox="0 0 814 1000"><path d="M788.1 340.9c-5.8 4.5-108.2 62.2-108.2 190.5 0 148.4 130.3 200.9 134.2 202.2-.6 3.2-20.7 71.9-68.7 141.9-42.8 61.6-87.5 123.1-155.5 123.1s-85.5-39.5-164-39.5c-76.5 0-103.7 40.8-165.9 40.8s-105.6-57-155.5-127C46.7 790.7 0 663 0 541.8c0-194.4 126.4-297.5 250.8-297.5 66.1 0 121.2 43.4 162.7 43.4 39.5 0 101.1-46 176.3-46 28.5 0 130.9 2.6 198.3 99.2zm-234-181.5c31.1-36.9 53.1-88.1 53.1-139.3 0-7.1-.6-14.3-1.9-20.1-50.6 1.9-110.8 33.7-147.1 75.8-28.5 32.4-55.1 83.6-55.1 135.5 0 7.8 1.3 15.6 1.9 18.1 3.2.6 8.4 1.3 13.6 1.3 45.4 0 102.5-30.4 135.5-71.3z"/></svg>
+    </a></li>
+    <li class="hide-m"><a href="#">Store</a></li>
+    <li class="hide-m"><a href="#">Mac</a></li>
+    <li class="hide-m"><a href="#">iPad</a></li>
+    <li><a href="#">iPhone</a></li>
+    <li class="hide-m"><a href="#">Watch</a></li>
+    <li class="hide-m"><a href="#">AirPods</a></li>
+    <li class="hide-m"><a href="#">TV &amp; Home</a></li>
+    <li class="hide-m"><a href="#">Support</a></li>
+    <li class="icon"><a href="#" aria-label="Search">
+      <svg viewBox="0 0 15 44"><path d="M14.3 27.6l-3.8-3.8a5.9 5.9 0 10-.7.7l3.8 3.8a.5.5 0 00.7-.7zM1.6 19.9a4.9 4.9 0 114.9 4.9 4.9 4.9 0 01-4.9-4.9z"/></svg>
+    </a></li>
+    <li class="icon"><a href="#" aria-label="Bag">
+      <svg viewBox="0 0 14 44"><path d="M11.3 14.7h-1.8a2.5 2.5 0 00-5 0H2.7A1.7 1.7 0 001 16.4v9.9A1.7 1.7 0 002.7 28h8.6a1.7 1.7 0 001.7-1.7v-9.9a1.7 1.7 0 00-1.7-1.7zM7 13.2a1.5 1.5 0 011.5 1.5h-3A1.5 1.5 0 017 13.2zm5 13.1a.7.7 0 01-.7.7H2.7a.7.7 0 01-.7-.7v-9.9a.7.7 0 01.7-.7h8.6a.7.7 0 01.7.7z"/></svg>
+    </a></li>
+  </ul>
+</nav>
+
+<!-- Hero -->
+<section id="hero">
+  <canvas id="stars"></canvas>
+  <div class="glow"></div>
+  <div class="kicker">Introducing</div>
+  <h1>iPhone</h1>
+  <div class="sub">Born among the stars. <b>Built for what's next.</b></div>
+  <div class="cta">
+    <a class="btn fill" href="#scrub">Watch the film</a>
+    <a class="btn line" href="#grid">Explore features</a>
+  </div>
+  <div class="chev">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
+  </div>
+</section>
+
+<!-- Scroll-scrubbed animation -->
+<section id="scrub">
+  <div class="stage">
+    <canvas id="frameCanvas"></canvas>
+    <div class="caption cap-1">
+      <h2>Design that defies gravity.</h2>
+      <p>Aerospace-grade titanium. Contoured edges. Impossibly light in the hand — unmistakable from every angle.</p>
+    </div>
+    <div class="caption cap-2">
+      <h2>A universe of power.</h2>
+      <p>The fastest chip ever in a smartphone bends physics to your will. Every frame, every pixel, at the speed of thought.</p>
+    </div>
+    <div class="caption cap-3">
+      <h2>Beyond the event horizon.</h2>
+    </div>
+    <div id="darkfade"></div>
+  </div>
+</section>
+
+<!-- Finale -->
+<section id="finale">
+  <h2 class="big reveal">An iPhone of Possibilities.</h2>
+  <p class="small reveal">Everything it is. Everything it will be. The most personal device we've ever made — ready for everywhere you'll take it.</p>
+  <div class="cta reveal">
+    <a class="btn fill" href="#">Pre-order now</a>
+    <a class="btn line" href="#">Learn more</a>
+  </div>
+</section>
+
+<!-- Feature grid -->
+<section id="grid">
+  <div class="headline reveal">
+    <h2>Every detail. Astronomical.</h2>
+    <p>Engineered to outperform everything — including itself.</p>
+  </div>
+  <div class="tiles">
+    <div class="tile w3 reveal">
+      <div class="em">🛰️</div>
+      <h3><span>A19 Pro chip.</span> A quantum leap.</h3>
+      <p>Desktop-class performance with breakthrough efficiency. Console-grade graphics with hardware ray tracing, everywhere you go.</p>
+    </div>
+    <div class="tile w3 reveal">
+      <div class="em">📸</div>
+      <h3><span>Pro camera system.</span> Shoot the stars.</h3>
+      <p>48MP main camera with next-generation photonic engine. Night mode so good, the dark is optional.</p>
+    </div>
+    <div class="tile w2 reveal">
+      <div class="stat">3000<span style="font-size:.5em">nits</span></div>
+      <div class="stat-l">Super Retina XDR. Brighter than ever.</div>
+    </div>
+    <div class="tile w2 reveal">
+      <div class="stat">33<span style="font-size:.5em">hrs</span></div>
+      <div class="stat-l">Video playback on a single charge.</div>
+    </div>
+    <div class="tile w2 reveal">
+      <div class="stat">2×</div>
+      <div class="stat-l">Faster Neural Engine for Apple Intelligence.</div>
+    </div>
+    <div class="tile w4 reveal">
+      <div class="em">✨</div>
+      <h3><span>Apple Intelligence.</span> Personal, private, powerful.</h3>
+      <p>Writing tools, Genmoji, and a smarter Siri — built into the platform, with groundbreaking privacy protections.</p>
+    </div>
+    <div class="tile w2 reveal">
+      <div class="em">🔒</div>
+      <h3>Privacy. <span>That's iPhone.</span></h3>
+      <p>Your data belongs to you. Face ID and on-device processing keep it that way.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="row">
+    <div>Copyright © 2026 Apple Inc. All rights reserved.</div>
+    <div>
+      <a href="#">Privacy Policy</a> &nbsp;|&nbsp; <a href="#">Terms of Use</a> &nbsp;|&nbsp; <a href="#">Legal</a>
+    </div>
+  </div>
+  <div>Concept page. The scroll film plays forward and in reverse as you scroll.</div>
+</footer>
+
+<script>
+/* ============ Frame preloading ============ */
+const FRAME_COUNT = 138;
+const framePath = i => `frames/frame_${String(i + 1).padStart(4, "0")}.jpg`;
+const frames = new Array(FRAME_COUNT);
+let loaded = 0;
+
+const loader = document.getElementById("loader");
+const loadbar = document.getElementById("loadbar");
+
+function preload() {
+  return new Promise(resolve => {
+    for (let i = 0; i < FRAME_COUNT; i++) {
+      const img = new Image();
+      img.src = framePath(i);
+      img.onload = img.onerror = () => {
+        loaded++;
+        loadbar.style.width = (loaded / FRAME_COUNT * 100) + "%";
+        if (loaded === FRAME_COUNT) resolve();
+      };
+      frames[i] = img;
+    }
+  });
+}
+
+/* ============ Canvas scrubbing ============ */
+const canvas = document.getElementById("frameCanvas");
+const ctx = canvas.getContext("2d");
+const scrub = document.getElementById("scrub");
+const darkfade = document.getElementById("darkfade");
+const caps = [
+  { el: document.querySelector(".cap-1"), a: 0.06, b: 0.30 },
+  { el: document.querySelector(".cap-2"), a: 0.36, b: 0.60 },
+  { el: document.querySelector(".cap-3"), a: 0.66, b: 0.86 },
+];
+
+let dpr = 1;
+function sizeCanvas() {
+  dpr = Math.min(window.devicePixelRatio || 1, 2);
+  canvas.width = innerWidth * dpr;
+  canvas.height = innerHeight * dpr;
+}
+addEventListener("resize", () => { sizeCanvas(); drawFrame(renderPos, true); });
+
+function drawFrame(pos, force) {
+  const idx = Math.max(0, Math.min(FRAME_COUNT - 1, Math.round(pos)));
+  const img = frames[idx];
+  if (!img || !img.naturalWidth) return;
+  // contain fit — whole frame visible, letterboxed with black on the sides
+  const cw = canvas.width, ch = canvas.height;
+  const s = Math.min(cw / img.naturalWidth, ch / img.naturalHeight);
+  const w = img.naturalWidth * s, h = img.naturalHeight * s;
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
+  ctx.fillStyle = "#000";
+  ctx.fillRect(0, 0, cw, ch);
+  ctx.drawImage(img, (cw - w) / 2, (ch - h) / 2, w, h);
+}
+
+function progress() {
+  const r = scrub.getBoundingClientRect();
+  const total = r.height - innerHeight;
+  return Math.max(0, Math.min(1, -r.top / total));
+}
+
+/* smooth scrub — lerp toward target so forward AND reverse scrolling is silky */
+let renderPos = 0;
+let lastDrawn = -1;
+function tick() {
+  const p = progress();
+  const target = p * (FRAME_COUNT - 1);
+  renderPos += (target - renderPos) * 0.22;
+  if (Math.abs(target - renderPos) < 0.05) renderPos = target;
+  const idx = Math.round(renderPos);
+  if (idx !== lastDrawn) { drawFrame(renderPos); lastDrawn = idx; }
+
+  // captions fade in/out over their progress windows
+  for (const c of caps) {
+    const mid = (c.a + c.b) / 2, half = (c.b - c.a) / 2;
+    const d = Math.abs(p - mid) / half;               // 0 center → 1 edge
+    const o = Math.max(0, Math.min(1, (1 - d) * 3));  // plateau in the middle
+    const ty = (p < mid ? 1 - Math.min(1, (p - c.a) / (half * 0.6)) : 0) * 40;
+    c.el.style.opacity = o;
+    c.el.style.setProperty("--ty", ty + "px");
+  }
+
+  // fade to black near the end so the finale lands seamlessly
+  darkfade.style.opacity = Math.max(0, (p - 0.88) / 0.12);
+
+  requestAnimationFrame(tick);
+}
+
+/* ============ Hero starfield ============ */
+const sc = document.getElementById("stars");
+const sctx = sc.getContext("2d");
+let stars = [];
+function initStars() {
+  sc.width = innerWidth * dpr; sc.height = innerHeight * dpr;
+  stars = Array.from({ length: 220 }, () => ({
+    x: Math.random() * sc.width,
+    y: Math.random() * sc.height,
+    r: (Math.random() * 1.4 + 0.3) * dpr,
+    tw: Math.random() * Math.PI * 2,
+    sp: 0.008 + Math.random() * 0.02
+  }));
+}
+function starTick(t) {
+  sctx.clearRect(0, 0, sc.width, sc.height);
+  for (const s of stars) {
+    s.tw += s.sp;
+    const a = 0.25 + Math.abs(Math.sin(s.tw)) * 0.7;
+    sctx.globalAlpha = a;
+    sctx.fillStyle = "#cdd6ff";
+    sctx.beginPath();
+    sctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+    sctx.fill();
+  }
+  sctx.globalAlpha = 1;
+  requestAnimationFrame(starTick);
+}
+addEventListener("resize", initStars);
+
+/* ============ Reveal on scroll ============ */
+const io = new IntersectionObserver(es => {
+  es.forEach(e => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } });
+}, { threshold: 0.18 });
+document.querySelectorAll(".reveal").forEach(el => io.observe(el));
+
+/* ============ Tile cursor glow ============ */
+document.querySelectorAll(".tile").forEach(t => {
+  t.addEventListener("pointermove", e => {
+    const r = t.getBoundingClientRect();
+    t.style.setProperty("--mx", (e.clientX - r.left) + "px");
+    t.style.setProperty("--my", (e.clientY - r.top) + "px");
+  });
+});
+
+/* ============ Boot ============ */
+sizeCanvas();
+initStars();
+requestAnimationFrame(starTick);
+preload().then(() => {
+  drawFrame(0, true);
+  loader.classList.add("done");
+  requestAnimationFrame(tick);
+});
+</script>
+</body>
+</html>
